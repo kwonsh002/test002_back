@@ -1,0 +1,65 @@
+name: Build and Push to ACR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_TAG: ""
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to ACR
+        run: |
+          echo "${{ secrets.AZURE_REGISTRY_KEY }}" | docker login "registrybluejay.azurecr.io" --username "registrybluejay" --password-stdin
+      - name: Build Docker image
+        id: build # 단계에 ID 부여
+        run: |
+          # 현재 타임스탬프를 YYYYMMDD-HHMMSS 형식으로 가져오기
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          echo "timestamp: $TIMESTAMP"
+          IMAGE_TAG="myapp:$TIMESTAMP"
+          echo "Image tag is $IMAGE_TAG"
+          # IMAGE_TAG 환경 변수에 값 할당
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # 이 줄은 필요 없습니다.
+          # 고유 태그로 Docker 이미지 빌드
+          docker build -t registrybluejay.azurecr.io/$IMAGE_TAG .
+      - name: Push Docker image
+        run: |
+          # 고유 태그로 Docker 이미지 푸시
+          echo "Pushing image with tag: $IMAGE_TAG"  # 푸시할 태그 출력
+          docker push registrybluejay.azurecr.io/$IMAGE_TAG
+
+      # 매니페스트 저장소 업데이트 단계
+      # - name: Checkout manifest repository
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: kwonsh002/k8s_manifest # 매니페스트 저장소
+      #     path: ./manifests # 체크아웃할 경로
+      #     token: ${{ secrets.ACTION_TOKEN }} # GitHub 인증 토큰
+
+      # - name: Update Kubernetes manifest with new image
+      #   run: |
+      #     # base 폴더 안에 있는 deployment.yaml 파일의 이미지 태그를 업데이트
+      #     sed -i "s|registrybluejay.azurecr.io/myapp:.*|registrybluejay.azurecr.io/$IMAGE_TAG|g" ./manifests/base/deployment.yaml
+
+      #     # 변경 사항 확인 (디버깅용)
+      #     cat ./manifests/base/deployment.yaml
+
+      # - name: Commit and push changes to manifest repo
+      #   run: |
+      #     cd manifests
+      #     git config --global user.email "kwonsh001@manoit.co.kr"
+      #     git config --global user.name "kwonsh002"
+      #     git add .
+      #     git commit -m "Update image tag to $IMAGE_TAG"
+      #     git push origin main  # 매니페스트 저장소의 main 브랜치로 푸시
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }} # GitHub 인증 토큰
