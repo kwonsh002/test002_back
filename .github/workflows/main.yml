@@ -41,7 +41,7 @@ jobs:
       - name: Checkout manifest repository
         uses: actions/checkout@v2
         with:
-          repository: test002_manifest # 매니페스트 저장소
+          repository: kwonsh002/test002_manifest # 매니페스트 저장소
           path: ./manifests # 체크아웃할 경로
           token: ${{ secrets.ACTION_TOKEN }} # GitHub 인증 토큰
 
