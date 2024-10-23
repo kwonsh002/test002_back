@@ -11,7 +11,8 @@ from sqlalchemy.orm import sessionmaker
 # SQLALCHEMY_DATABASE_URL = "mysql+pymysql://admin:password123@rds-crider.czkkeoasq36g.ap-southeast-2.rds.amazonaws.com:3306/cirderdb"
 # SQLALCHEMY_DATABASE_URL = "mysql+pymysql://admin:password123@rds-crider.cheaiyuk4ex1.us-east-1.rds.amazonaws.com:3306/criderdb"
 #SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:3778@localhost:3306/test002"
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://kwon001:Manoit123@test-test002-db.mysql.database.azure.com/test"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://kwon001:Manoit123@test-test002-db.mysql.database.azure.com:3306/test"
+
 
 
 engine = create_engine(
